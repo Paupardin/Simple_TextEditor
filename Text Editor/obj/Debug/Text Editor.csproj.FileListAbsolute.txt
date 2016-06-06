@@ -1,0 +1,9 @@
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\bin\Debug\Text Editor.exe.config
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\bin\Debug\Text Editor.exe
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\bin\Debug\Text Editor.pdb
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\obj\Debug\Text Editor.csprojResolveAssemblyReference.cache
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\obj\Debug\Text_Editor.Form1.resources
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\obj\Debug\Text_Editor.Properties.Resources.resources
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\obj\Debug\Text Editor.csproj.GenerateResource.Cache
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\obj\Debug\Text Editor.exe
+c:\users\陸勇盛\documents\visual studio 2013\Projects\Text Editor\Text Editor\obj\Debug\Text Editor.pdb
