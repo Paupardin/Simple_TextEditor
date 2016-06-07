@@ -20,6 +20,7 @@ namespace Text_Editor {
         private string filename { get; set; }
         private string textBuffer { get; set; }
         private string currTimeDate { get; set; }
+        private string currState { get; set; }
 
         public Form1() {
             InitializeComponent();
@@ -35,6 +36,11 @@ namespace Text_Editor {
             // Initial the row and col numbers.
             row = 0;
             col = 0;
+
+            // Initial timer and progress bar.
+            timer_pb.Interval = 500;
+            toolStripProgressBar1.Maximum = 100;
+            toolStripProgressBar1.Value = 0;
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -52,10 +58,6 @@ namespace Text_Editor {
             openFileDialog.RestoreDirectory = true;
             openFileDialog.Multiselect = false;
 
-            // Set the ProgressBar.
-            toolStripProgressBar1.Maximum = 100;
-            toolStripProgressBar1.Minimum = 0;
-
             // Open file.
             if (openFileDialog.ShowDialog() == DialogResult.OK && openFileDialog.FileName.Length > 0) {
                 try {
@@ -69,22 +71,11 @@ namespace Text_Editor {
                     permission.AllLocalFiles = FileIOPermissionAccess.Read;
                     try {
                         permission.Demand();
-                        richTextBox1.LoadFile(filepath + "\\" + filename, RichTextBoxStreamType.RichText);
+                        currState = "load";
+                        timer_pb.Enabled = true;
                     }
                     catch (SecurityException ex) {
                         MessageBox.Show(ex.Message, "Text Editor - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    
-                    // Progress Bar
-                    while (toolStripProgressBar1.Value != 100) {
-                        toolStripProgressBar1.Increment(25);
-                    }
-
-                    // Open file successful.
-                    if (toolStripProgressBar1.Value == toolStripProgressBar1.Maximum) {
-                        DialogResult result = MessageBox.Show("Open file successful!", "Open", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        if (result == DialogResult.OK)
-                            toolStripProgressBar1.Value = 0;
                     }
 
                     // Show the file path on the window title.
@@ -106,10 +97,6 @@ namespace Text_Editor {
             savaFileDialog.RestoreDirectory = true;
             savaFileDialog.OverwritePrompt = true;
 
-            // fix.
-            toolStripProgressBar1.Minimum = 0;
-            toolStripProgressBar1.Maximum = 100;
-
             if (filename == "untitled.txt") {   // New file saving.
                 if (savaFileDialog.ShowDialog() == DialogResult.OK && savaFileDialog.FileName.Length > 0) {
                     // Get the file info.
@@ -122,22 +109,11 @@ namespace Text_Editor {
                     permission.AllLocalFiles = FileIOPermissionAccess.Read;
                     try {
                         permission.Demand();
-                        richTextBox1.SaveFile(filepath + "\\" + filename, RichTextBoxStreamType.RichText);
+                        currState = "save";
+                        timer_pb.Enabled = true;
                     }
                     catch (SecurityException ex) {
                         MessageBox.Show(ex.Message, "Text Editor - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-
-                    // Progress bar.
-                    while (toolStripProgressBar1.Value < 100) {
-                        toolStripProgressBar1.Increment(25);
-                    }
-
-                    // Save file successful.
-                    if (toolStripProgressBar1.Value == toolStripProgressBar1.Maximum) {
-                        DialogResult result = MessageBox.Show("Save successful!", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        if (result == DialogResult.OK)
-                            toolStripProgressBar1.Value = 0;
                     }
                 }
             }
@@ -147,22 +123,11 @@ namespace Text_Editor {
                 permission.AllLocalFiles = FileIOPermissionAccess.Read;
                 try {   // Saving.
                     permission.Demand();
-                    richTextBox1.SaveFile(filepath + "\\" + filename, RichTextBoxStreamType.RichText);
+                    currState = "save";
+                    timer_pb.Enabled = true;
                 }
                 catch (SecurityException ex) {
                     MessageBox.Show(ex.Message, "Text Editor - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
-                // Progress bar.
-                while (toolStripProgressBar1.Value < 100) {
-                    toolStripProgressBar1.Increment(25);
-                }
-
-                // Save file successful.
-                if (toolStripProgressBar1.Value == toolStripProgressBar1.Maximum) {
-                    DialogResult result = MessageBox.Show("Save successful!", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    if (result == DialogResult.OK)
-                        toolStripProgressBar1.Value = 0;
                 }
             }
 
@@ -180,10 +145,6 @@ namespace Text_Editor {
             savaFileDialog.RestoreDirectory = true;
             savaFileDialog.OverwritePrompt = true;
 
-            // fix.
-            toolStripProgressBar1.Minimum = 0;
-            toolStripProgressBar1.Maximum = 100;
-
             // Save as file.
             if (savaFileDialog.ShowDialog() == DialogResult.OK && savaFileDialog.FileName.Length > 0) {
                 // Get the file info.
@@ -196,22 +157,11 @@ namespace Text_Editor {
                 permission.AllLocalFiles = FileIOPermissionAccess.Read;
                 try {
                     permission.Demand();
-                    richTextBox1.SaveFile(filepath + "\\" + filename, RichTextBoxStreamType.RichText);
+                    currState = "save";
+                    timer_pb.Enabled = true;
                 }
                 catch (SecurityException ex) {
                     MessageBox.Show(ex.Message, "Text Editor - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                
-                // Progress bar.
-                while (toolStripProgressBar1.Value != toolStripProgressBar1.Maximum) {
-                    toolStripProgressBar1.Increment(25);
-                }
-
-                // Save file successful.
-                if (toolStripProgressBar1.Value == toolStripProgressBar1.Maximum) {
-                    DialogResult result = MessageBox.Show("Save successful!", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    if (result == DialogResult.OK)
-                        toolStripProgressBar1.Value = 0;
                 }
             }
 
@@ -307,6 +257,56 @@ namespace Text_Editor {
 
             label_row.Text = Convert.ToString(row);
             label_col.Text = Convert.ToString(col);
+        }
+
+        private void richTextBox1_EnabledChanged(object sender, EventArgs e) {
+            label_status.Text = "Editing";
+        }
+
+        // Timer.
+        private void timer_pb_Tick(object sender, EventArgs e) {
+            if (toolStripProgressBar1.Value < toolStripProgressBar1.Maximum) {
+                toolStripProgressBar1.Value += 25;
+                richTextBox1.Enabled = false;
+                if (currState == "save") {
+                    label_status.Text = "Saving：" + (toolStripProgressBar1.Value).ToString("#") + "%";
+                }
+                else if (currState == "load") {
+                    label_status.Text = "Loading：" + (toolStripProgressBar1.Value).ToString("#") + "%";
+                }
+            }
+            else {
+                timer_pb.Enabled = false;
+                label_status.Text = "Finish";
+
+                DialogResult result;
+                if (currState == "load") {
+                    loadFile();
+                    result = MessageBox.Show("Load successful.", "Load", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (result == DialogResult.OK) {
+                        toolStripProgressBar1.Value = 0;
+                        richTextBox1.Enabled = true;
+                    }
+                }
+                else if (currState == "save") {
+                    saveFile();
+                    result = MessageBox.Show("Save successful.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (result == DialogResult.OK) {
+                        toolStripProgressBar1.Value = 0;
+                        richTextBox1.Enabled = true;
+                    }
+                }
+            }
+        }
+
+        // Save file.
+        private void loadFile() {
+            richTextBox1.LoadFile(filepath + "\\" + filename, RichTextBoxStreamType.RichText);
+        }
+
+        // Load file.
+        private void saveFile() {
+            richTextBox1.SaveFile(filepath + "\\" + filename, RichTextBoxStreamType.RichText);
         }
     }
 }
